@@ -55,18 +55,21 @@ public function main(string... args) {
         }
     }
 
+    // add support grpc call 
+
+    
     // Cancel an order
-    log:printInfo("-------------------------Cancel an order------------------------");
-    var cancelResponse = orderMgtBlockingEp->cancelOrder("100500");
-    match cancelResponse {
-        (string, grpc:Headers) payload => {
-            string result;
-            grpc:Headers resHeaders;
-            (result, resHeaders) = payload;
-            log:printInfo("Response - " + result + "\n");
-        }
-        error err => {
-            log:printError("Error from Connector: " + err.message + "\n");
-        }
-    }
+    // log:printInfo("-------------------------Cancel an order------------------------");
+    // var cancelResponse = orderMgtBlockingEp->cancelOrder("100500");
+    // match cancelResponse {
+    //     (string, grpc:Headers) payload => {
+    //         string result;
+    //         grpc:Headers resHeaders;
+    //         (result, resHeaders) = payload;
+    //         log:printInfo("Response - " + result + "\n");
+    //     }
+    //     error err => {
+    //         log:printError("Error from Connector: " + err.message + "\n");
+    //     }
+    // }
 }

@@ -1,19 +1,23 @@
 import ballerina/http;
 import ballerinax/docker;
-
+import ballerina/log;
+import ballerina/grpc;
+import dalong/petstore;
 @docker:Config {
     registry:"dalongrong",
     name:"restful_service",
     tag:"v1.0"
 }
 endpoint http:Listener listener {
-    port:9090
+    port:9093
 };
 // Order management is done using an in memory map.
 // Add some sample orders to 'ordersMap' at startup.
 map<json> ordersMap;
 
-
+ endpoint orderMgtBlockingClient orderMgtBlockingEp {
+        url:"http://localhost:9090"
+ };
 // RESTful service.
 @http:ServiceConfig { basePath: "/ordermgt" }
 service<http:Service> orderMgt bind listener {
@@ -23,7 +27,29 @@ service<http:Service> orderMgt bind listener {
         path: "/grpc/{orderId}"
     }
     grpc(endpoint client, http:Request req, string orderId) {
-     
+     // Find an order
+    log:printInfo("---------------------Find an existing order---------------------");
+    var findResponse = orderMgtBlockingEp->findOrder(orderId);
+    match findResponse {
+        (string, grpc:Headers) payload => {
+            string result;
+            grpc:Headers resHeaders;
+            (result, resHeaders) = payload;
+            log:printInfo("Response - " + result + "\n");
+            _ = client->respond(result);
+        }
+        error err => {
+            log:printError("Error from Connector: " + err.message + "\n");
+        }
+    }
+    }
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/app"
+    }
+    petinfo(endpoint client, http:Request req) {
+         petstore:Pet p = {id:"dalong",category:"dddd",name:"demo name"};
+         _ = client->respond(check  <json>p);
     }
     // Resource that handles the HTTP GET requests that are directed to a specific
     // order using path '/order/<orderId>'.

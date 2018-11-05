@@ -12,7 +12,7 @@ import ballerinax/docker;
 
 @docker:Expose{}
 endpoint http:Listener ep0 { 
-    port: 9090
+    port: 9095
 };
 
 @swagger:ServiceInfo { 
